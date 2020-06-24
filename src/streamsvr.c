@@ -496,8 +496,9 @@ static void *strsvrthread(void *arg)
             while ((n=strread(svr->stream+i,buff,sizeof(buff)))>0) {
                 
                 /* relay back message from output stream to input stream */
-                if (i==svr->relayback) {
+                if (i==1&&(int)(tick-tick_nmea)>=svr->relayback) {
                     strwrite(svr->stream,buff,n);
+                    tick_nmea=tick;
                 }
             }
         }
@@ -608,7 +609,8 @@ extern int strsvrstart(strsvr_t *svr, int *opts, int *strs, char **paths,
     svr->cycle=opts[4];
     svr->buffsize=opts[3]<4096?4096:opts[3]; /* >=4096byte */
     svr->nmeacycle=0<opts[5]&&opts[5]<1000?1000:opts[5]; /* >=1s */
-    svr->relayback=opts[7];
+    svr->relayback=0<opts[7]&&opts[7]<1000?1000:opts[7]; /* >=1s */
+    
     for (i=0;i<3;i++) svr->nmeapos[i]=nmeapos?nmeapos[i]:0.0;
     for (i=0;i<4;i++) {
         strcpy(svr->cmds_periodic[i],!cmds_periodic[i]?"":cmds_periodic[i]);
