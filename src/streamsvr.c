@@ -496,7 +496,7 @@ static void *strsvrthread(void *arg)
             while ((n=strread(svr->stream+i,buff,sizeof(buff)))>0) {
                 
                 /* relay back message from output stream to input stream */
-                if (i==1&&(int)(tick-tick_nmea)>=svr->relayback) {
+                if (svr->relayback>0&&i==1&&(int)(tick-tick_nmea)>=svr->relayback) {
                     strwrite(svr->stream,buff,n);
                     tick_nmea=tick;
                 }
